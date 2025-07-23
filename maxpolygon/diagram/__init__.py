@@ -13,7 +13,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 from ._fraction_str import decimal_inches_to_fraction
 from ._basic_diagram import to_px, create_basic_diagram
-from ._edge import label_edge
+from ._label_edge import label_edge
 from maxpolygon.math.sublengths import determine_sublengths
 
 """
@@ -22,13 +22,12 @@ These are constants that influence the diagram output.
 
 # Measurement settings.
 USING_INCHES = True  # if True, uses fractions.
-TO_THE_32TH = False  # only applicable for inches.
-BRACKET_THICKNESS_PX = 50
+TO_THE_32TH = True  # only applicable for inches.
+BRACKET_THICKNESS_PX = 60
 PX_PADDING_FROM_EDGE = 30  # margin between brackets and paper (in px).
 
 # Bracket settings.
 PX_OPEN = 30
-
 
 
 def draw_diagram(
@@ -36,7 +35,7 @@ def draw_diagram(
     center: tuple,
     indexed_hint_points: list,
     paper_size,
-    invert_y: bool=True,
+    invert_y: bool = True,
 ):
     """
     Draws a diagram and returns the PIL image object.
@@ -46,7 +45,7 @@ def draw_diagram(
     - center (x, y): the center of the polygon.
     - indexed_hint_points (list): a list of lists, where each index holds
                                   a list of points that can be used to help
-                                  one determine the point 
+                                  one determine the point
                                   of the point <coords[i]>.
     - paper_size (number): the side length of the square the polygon is inside.
     - invert_y (bool): if True, the diagram is drawn with the Y-coords flipped.
@@ -56,7 +55,7 @@ def draw_diagram(
     # 1) Load the fonts.
     current_file = Path(__file__).resolve()
     font_path = current_file.parent.parent / "res" / "font.otf"
-    #big_font = ImageFont.truetype(font_path, size=41)
+    # big_font = ImageFont.truetype(font_path, size=41)
     measure_font = ImageFont.truetype(font_path, size=38)
 
     # 2) Create the image and draw shapes.
@@ -67,24 +66,23 @@ def draw_diagram(
 
     # 3) Determine the lengths
     #    of the subdivided side lengths for each edge.
-    right_sublengths, \
-    top_sublengths, \
-    left_sublengths, \
-    bottom_sublengths = determine_sublengths(
-        coords,
-        indexed_hint_points,
-        paper_size,
-        invert_y,
+    right_sublengths, top_sublengths, left_sublengths, bottom_sublengths = (
+        determine_sublengths(
+            coords,
+            indexed_hint_points,
+            paper_size,
+            invert_y,
+        )
     )
 
     # 4) Label the sublengths along the edges.
     def to_label_string(units) -> str:
-        """ 
-        Takes the given measurement (in units) and returns a strings 
+        """
+        Takes the given measurement (in units) and returns a strings
         that format the measurement in a clean way.
         """
         if USING_INCHES:
-            return decimal_inches_to_fraction(units, to_32th=TO_THE_32TH)
+            return decimal_inches_to_fraction(units, to_32th=TO_THE_32TH) + '"'
         else:
             return f"{round(units, 1):.1f}"
 
@@ -99,6 +97,7 @@ def draw_diagram(
         last_y += sublength
         px_y_end = to_px(last_y, paper_size=paper_size, invert=not invert_y)
         label_edge(
+            label_str=to_label_string(sublength),
             draw=draw,
             start_xy=(px_right_x, px_y_start),
             end_xy=(px_right_x, px_y_end),
@@ -115,6 +114,7 @@ def draw_diagram(
         last_y += sublength
         px_y_end = to_px(last_y, paper_size=paper_size, invert=not invert_y)
         label_edge(
+            label_str=to_label_string(sublength),
             draw=draw,
             start_xy=(px_left_x, px_y_start),
             end_xy=(px_left_x, px_y_end),
@@ -131,6 +131,7 @@ def draw_diagram(
         last_x += sublength
         px_x_end = to_px(last_x, paper_size=paper_size)
         label_edge(
+            label_str=to_label_string(sublength),
             draw=draw,
             start_xy=(px_x_start, px_top_y),
             end_xy=(px_x_end, px_top_y),
@@ -147,6 +148,7 @@ def draw_diagram(
         last_x += sublength
         px_x_end = to_px(last_x, paper_size=paper_size)
         label_edge(
+            label_str=to_label_string(sublength),
             draw=draw,
             start_xy=(px_x_start, px_bottom_y),
             end_xy=(px_x_end, px_bottom_y),
@@ -154,6 +156,5 @@ def draw_diagram(
             stem_dir="down",
             bracket_thickness_px=BRACKET_THICKNESS_PX,
         )
-
 
     return img

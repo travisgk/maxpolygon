@@ -18,13 +18,14 @@ def draw_arc(
     start_angle,
     end_angle,
     fill="green",
+    width=6,
 ):
     """
-    Draws an arc from one coord to another 
+    Draws an arc from one coord to another
     with a (start) and (end) angle.
-    
+
     """
-    WIDTH = 6
+
     def make_bbox(start_xy, end_xy):
         x0, y0 = start_xy
         x1, y1 = end_xy
@@ -39,19 +40,19 @@ def draw_arc(
 
     # Expand the bbox.
     if expand_right:  # expanding rightward.
-        bbox = (bbox[0] - WIDTH/2, bbox[1], bbox[2] + w, bbox[3])
+        bbox = (bbox[0] - width / 2, bbox[1], bbox[2] + w, bbox[3])
     else:  # expanding leftward.
-        bbox = (bbox[0] - w, bbox[1], bbox[2] + WIDTH/2, bbox[3])
+        bbox = (bbox[0] - w, bbox[1], bbox[2] + width / 2, bbox[3])
 
     if expand_down:  # expanding downward.
-        bbox = (bbox[0], bbox[1] - WIDTH/2, bbox[2], bbox[3] + h)
+        bbox = (bbox[0], bbox[1] - width / 2, bbox[2], bbox[3] + h)
     else:  # expanding upward.
-        bbox = (bbox[0], bbox[1] - h, bbox[2], bbox[3] + WIDTH/2)
+        bbox = (bbox[0], bbox[1] - h, bbox[2], bbox[3] + width / 2)
 
     draw.arc(
         bbox,
         start=start_angle,
         end=end_angle,
         fill=fill,
-        width=WIDTH,
+        width=width,
     )

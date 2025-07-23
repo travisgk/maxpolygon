@@ -9,10 +9,11 @@ Description: This file contains a function which can take
              and return it as a string using fractions.
 """
 
-def decimal_inches_to_fraction(inches, to_32th: bool=False) -> str:
-    """ 
-    Takes a number of inches and returns it as a str with fractions. 
-    
+
+def decimal_inches_to_fraction(inches, to_32th: bool = False) -> str:
+    """
+    Takes a number of inches and returns it as a str with fractions.
+
     Params:
         - inches (number): the number of inches.
         - to_32th (bool): if True, the fraction is rounded to the nearest 32nd.
@@ -76,4 +77,4 @@ def decimal_inches_to_fraction(inches, to_32th: bool=False) -> str:
     if whole == 0 and fraction_str != "":
         return fraction_str  # fraction number only
     else:
-        return f"{whole}{fraction_str}"  # whole + fraction
+        return f"{whole} {fraction_str}"  # whole + fraction

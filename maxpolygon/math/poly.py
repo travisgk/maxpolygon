@@ -12,16 +12,14 @@ Description: This file contains functionality
 import math
 import numpy as np
 
-# Create a cache of normalized polygon points 
+# Create a cache of normalized polygon points
 # to optimize finding the best angle.
-_angles_cache = {
-    n: np.linspace(0, 2*np.pi, n, endpoint=False) for n in range(3,33)
-}
+_angles_cache = {n: np.linspace(0, 2 * np.pi, n, endpoint=False) for n in range(3, 33)}
 
 
 def generate_polygon_coords(n: int, rotation=0.0):
-    """ 
-    Generates the coordinates of a regular polygon with n sides 
+    """
+    Generates the coordinates of a regular polygon with n sides
     inscribed in a unit circle, optionally rotated by rotation radians.
     """
     angles = _angles_cache.get(n) + rotation
@@ -29,11 +27,11 @@ def generate_polygon_coords(n: int, rotation=0.0):
 
 
 def calc_bbox_size(coords):
-    """ 
+    """
     Returns a tuple of (width, height, min_x, min_y) for the bbox of coords.
     """
-    min_x, max_x = coords[:,0].min(), coords[:,0].max()
-    min_y, max_y = coords[:,1].min(), coords[:,1].max()
+    min_x, max_x = coords[:, 0].min(), coords[:, 0].max()
+    min_y, max_y = coords[:, 1].min(), coords[:, 1].max()
     return max_x - min_x, max_y - min_y, min_x, min_y
 
 
@@ -49,18 +47,18 @@ def calc_polygon_area(coords: np.ndarray) -> float:
     # Append the first point at the end to close the loop.
     x_next = np.roll(x, -1)
     y_next = np.roll(y, -1)
-    
+
     return 0.5 * abs(np.dot(x, y_next) - np.dot(y, x_next))
 
 
 def find_rotation_of_smallest_bbox(n: int):
     """
-    Returns the radian rotation that gives a perfect polygon 
+    Returns the radian rotation that gives a perfect polygon
     of <n> sides whose bounding box is covered the most percent-wise.
     """
-    radian_candidates = np.linspace(0, np.pi/n, 100_001)
+    radian_candidates = np.linspace(0, np.pi / n, 100_001)
     poly_area = calc_polygon_area(generate_polygon_coords(n))
-    
+
     best_angle = 0
     best_bbox_coverage = 0
 
@@ -69,7 +67,7 @@ def find_rotation_of_smallest_bbox(n: int):
         coords = generate_polygon_coords(n, rotation=angle)
         w, h, min_x, min_y = calc_bbox_size(coords)
         max_dim = max(w, h)
-        bbox_area = max_dim ** 2  # since polygon must fit into a square
+        bbox_area = max_dim**2  # since polygon must fit into a square
         percent_bbox_covered = poly_area / bbox_area
         if percent_bbox_covered > best_bbox_coverage:
             best_angle = angle
@@ -116,17 +114,17 @@ def determine_hint_points(coords, paper_size):
 
     # 1) Determine which points are not along an edge.
     edgeless = [
-        i for i, (x, y) in enumerate(coords)
+        i
+        for i, (x, y) in enumerate(coords)
         if all(0.001 < d < paper_size - 0.001 for d in (x, y))
     ]
 
-    # 2) Determine the hint points that are projected 
+    # 2) Determine the hint points that are projected
     #    by the line formed by a point on and edge and a point not on an edge.
     for i in edgeless:
         # 2a) Find the neighbor indices (prev and next elements).
         neighbor_indices = [
-            x if x not in edgeless else -1 
-            for x in [(i - 1) % n, (i + 1) % n]
+            x if x not in edgeless else -1 for x in [(i - 1) % n, (i + 1) % n]
         ]
 
         if len(neighbor_indices) > 0:
@@ -148,7 +146,7 @@ def determine_hint_points(coords, paper_size):
                 # 3) Calculate the angle pointing from the neighbor to edgeless.
                 rads = math.atan2(y2 - y1, x2 - x1)
                 rads -= math.pi  # flips 180°.
-                while rads < 0: 
+                while rads < 0:
                     rads += 2 * math.pi  # forces radians within 0 and 2 pi.
                 while rads >= 2 * math.pi:
                     rads -= 2 * math.pi  # forces radians within 0 and 2 pi.
@@ -160,22 +158,22 @@ def determine_hint_points(coords, paper_size):
                 if rads == 0:  # right.
                     indexed_hint_points[i].append((paper_size, y2))
                     continue  # to the next neighbor.
-                elif rads == math.pi/2:  # up.
+                elif rads == math.pi / 2:  # up.
                     indexed_hint_points[i].append((x2, paper_size))
                     continue  # to the next neighbor.
                 elif rads == math.pi:  # left.
                     indexed_hint_points[i].append((0, y2))
                     continue  # to the next neighbor.
-                elif rads == 3*math.pi/2:  # down.
+                elif rads == 3 * math.pi / 2:  # down.
                     indexed_hint_points[i].append((x2, 0))
                     continue  # to the next neighbor.
-                elif rads < math.pi/2:
+                elif rads < math.pi / 2:
                     border_x = paper_size
                     border_y = paper_size
                 elif rads < math.pi:
                     border_x = 0
                     border_y = paper_size
-                elif rads < 3*math.pi/2:
+                elif rads < 3 * math.pi / 2:
                     border_x = 0
                     border_y = 0
                 else:
@@ -205,10 +203,10 @@ def determine_hint_points(coords, paper_size):
 
 
 def generate_paper_points(n: int, paper_size):
-    """ 
-    Returns a list of coords, the center point, 
+    """
+    Returns a list of coords, the center point,
     and hint points by index for each in <coords>.
-    
+
     Params:
     - n (int): The number of sides the polygon has.
     - paper_size: The side length of the square piece of paper.

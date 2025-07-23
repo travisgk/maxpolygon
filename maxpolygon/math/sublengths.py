@@ -19,6 +19,7 @@ Description: This file contains a function which will take a list of coords
              a "clockwise" hint point rather than an "anticlockwise" one.
 """
 
+
 def determine_sublengths(
     coords: list,
     indexed_hint_points: list,
@@ -44,11 +45,11 @@ def determine_sublengths(
     top_x_breaks = []  # X-coords where the top edge is divided. low Y.
     left_y_breaks = []  # Y-coords where the left edge is divided. low X.
     bottom_x_breaks = []  # X-coords where the bottom edge is divided. high Y.
-    
+
     # 2a) Define a helper function to sort into those four lists.
     def sort_vert_to_edge(x, y):
         """
-        Takes the point (x, y) and sorts it 
+        Takes the point (x, y) and sorts it
         under the appropriate list (if any).
         """
         D = 0.01  # accuracy to be considered on an edge.
@@ -72,7 +73,7 @@ def determine_sublengths(
             if not on_vert_edge(x):  # not in a corner
                 bottom_x_breaks.append(x)
 
-    # 2b) Find all the vertices that divide each of the four edges 
+    # 2b) Find all the vertices that divide each of the four edges
     #     using the function.
     for x, y in coords:
         sort_vert_to_edge(x, y)
@@ -80,7 +81,6 @@ def determine_sublengths(
     for hints in indexed_hint_points:
         for x, y in hints:
             sort_vert_to_edge(x, y)
-
 
     # 3) Edge-dividing points are inverted to match the output graphic.
     if invert_y:
@@ -99,7 +99,7 @@ def determine_sublengths(
     # 5) Now the distances between the dividing points are calculated
     #    using a helper function.
     def calc_sublengths(breaks: list) -> list:
-        """ 
+        """
         Returns a list of segment lengths that the side is divided into.
         """
         if len(breaks) == 0:
