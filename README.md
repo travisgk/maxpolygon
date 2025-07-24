@@ -1,9 +1,22 @@
 # MaxPolygon
-This script determines the points of the largest possible perfect polygon on a square sheet of paper, then draws and saves a diagram.
 
-The measurements are relative to the closest edge of the paper. Extra hint points are provided that form lines with other points on edges in order to create intersecting points; these intersections will be the polygon points that are not on an edge.
+This script generates a diagram of the largest possible regular polygon that can fit inside a square sheet of paper. 
 
-This script is helpful for cutting out perfect polygons out of paper and is efficient in ensuring that the most surface area possible is used.
+![A heptagon.](output/poly-7.png)
 
-![A pentagon.](output/poly-5.png)![A heptagon.](output/poly-7.png)![A nonagon.](output/poly-9.png)
+The diagram has side measurements that help you cut out a perfect, symmetrical shape that maximizes the use of the available surface area.
+
+<br>
+
+## Dependencies
+You will need PIL and numpy to run this script.
+```pip install pillow numpy```
+
+<br>
+
+# Results
+![A pentagon.](output/poly-5.png)![A nonagon.](output/poly-9.png)![A triangle.](output/poly-3.png)
 <em>a</em> stands for anticlockwise and <em>c</em> stands for clockwise.
+
+### Configuration
+You can change constants under maxpolygon._config.py in order to modify the appearance.
