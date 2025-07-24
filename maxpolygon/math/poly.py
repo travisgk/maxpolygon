@@ -12,7 +12,7 @@ Description: This file contains functionality
 import math
 import numpy as np
 
-MAX_NUM_SIDES = 33
+from maxpolygon._config import MAX_NUM_SIDES
 
 # Create a cache of normalized polygon points
 # to optimize finding the best angle.
@@ -227,7 +227,7 @@ def generate_paper_points(n: int, paper_size):
     coords = np.vstack([coords, center])
 
     # Scale all the coords from [-1, 1] to [0, paper_size].
-    coords = scale_to_square(coords, 13.4)
+    coords = scale_to_square(coords, paper_size)
     coords = [(x, y) for (x, y) in coords]
 
     # Separate the center point from the coords list.

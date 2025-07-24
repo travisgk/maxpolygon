@@ -83,7 +83,6 @@ def calc_bracket_points(
     if s <= 0:
         stem = None
     elif vertical_stem:
-        # stem = (branch_x, branch_y + s * ((stem_dir == "down") * 2 - 1))
         # Move all the points vertically.
         add_y = s * ((stem_dir == "down") * 2 - 1) / 2
         g0 = (g0[0], g0[1] + add_y)
@@ -94,7 +93,6 @@ def calc_bracket_points(
         stem = (branch_x, branch_y + s * ((stem_dir == "down") * 2 - 1))
 
     else:
-        # stem = (branch_x + s * ((stem_dir == "right") * 2 - 1), branch_y)
         # Move all the points horizontally.
         add_x = s * ((stem_dir == "right") * 2 - 1) / 2
         g0 = (g0[0] + add_x, g0[1])

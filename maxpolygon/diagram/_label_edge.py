@@ -12,6 +12,7 @@ Description: This file contains the function
 from ._arc import draw_arc
 from ._basic_diagram import ANTIALIAS
 from maxpolygon.math.bracket import calc_bracket_points
+from maxpolygon._config import BRACKET_LINE_WIDTH, MEASURE_FONT_SIZE
 from pathlib import Path
 from PIL import ImageFont
 
@@ -29,7 +30,6 @@ def label_edge(
     fill="gray",
 ):
     global _measure_font
-    WIDTH = 6 * ANTIALIAS  # line width.
 
     def inc_angle(angle, add, exclude_360: bool):
         return (angle + add) % (360.0001 if exclude_360 else 360.0)
@@ -68,7 +68,7 @@ def label_edge(
         start_angle=g0_start,
         end_angle=g0_end,
         fill=fill,
-        width=WIDTH,
+        width=BRACKET_LINE_WIDTH,
     )
     draw_arc(
         draw,
@@ -77,7 +77,7 @@ def label_edge(
         start_angle=g1_start,
         end_angle=g1_end,
         fill=fill,
-        width=WIDTH,
+        width=BRACKET_LINE_WIDTH,
     )
 
     # 3) Draw the curves to the branch point.
@@ -89,7 +89,7 @@ def label_edge(
         start_angle=inc_angle(g0_start, 180, exclude_360=exclude_360),
         end_angle=inc_angle(g0_end, 180, exclude_360=exclude_360),
         fill=fill,
-        width=WIDTH,
+        width=BRACKET_LINE_WIDTH,
     )
     draw_arc(
         draw,
@@ -98,12 +98,12 @@ def label_edge(
         start_angle=inc_angle(g1_start, 180, exclude_360=exclude_360),
         end_angle=inc_angle(g1_end, 180, exclude_360=exclude_360),
         fill=fill,
-        width=WIDTH,
+        width=BRACKET_LINE_WIDTH,
     )
 
     # 4) Draw the connecting lines between the curves.
     def draw_connection(g: tuple, b: tuple):
-        W = WIDTH / 2
+        W = BRACKET_LINE_WIDTH / 2
         if stem_dir in ["up", "down"]:
             # Y is mostly constant (line moving horizontally).
             min_x, max_x = min(g[0], b[0]), max(g[0], b[0])
@@ -129,7 +129,7 @@ def label_edge(
     draw_connection(g=g1, b=b1)
 
     # 5) Draw the stem.
-    W = WIDTH / 2
+    W = BRACKET_LINE_WIDTH / 2
     if stem is not None:
         min_x, max_x = min(branch[0], stem[0]), max(branch[0], stem[0])
         min_y, max_y = min(branch[1], stem[1]), max(branch[1], stem[1])
@@ -156,7 +156,7 @@ def label_edge(
     if _measure_font is None:
         current_file = Path(__file__).resolve()
         font_path = current_file.parent.parent / "res" / "font.otf"
-        _measure_font = ImageFont.truetype(font_path, size=38 * ANTIALIAS)
+        _measure_font = ImageFont.truetype(font_path, size=MEASURE_FONT_SIZE)
 
     # 8) Center the text box.
     bbox = _measure_font.getbbox(label_str)

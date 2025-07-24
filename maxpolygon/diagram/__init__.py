@@ -15,18 +15,13 @@ from ._fraction_str import decimal_inches_to_fraction
 from ._basic_diagram import ANTIALIAS, to_px, create_basic_diagram
 from ._label_edge import label_edge
 from maxpolygon.math.sublengths import determine_sublengths
+from maxpolygon._config import MEASURE_FONT_SIZE, TITLE_FONT_SIZE
 
 """
 These are constants that influence the diagram output.
 """
 
-# Measurement settings.
-TO_THE_32TH = True  # only applicable for inches.
-BRACKET_THICKNESS_PX = 60 * ANTIALIAS
-PX_PADDING_FROM_EDGE = 30 * ANTIALIAS  # margin between brackets and paper (in px).
-
-# Bracket settings.
-PX_OPEN = 30 * ANTIALIAS
+from maxpolygon._config import *
 
 
 def draw_diagram(
@@ -56,7 +51,7 @@ def draw_diagram(
     # 1) Load the fonts.
     current_file = Path(__file__).resolve()
     font_path = current_file.parent.parent / "res" / "font.otf"
-    measure_font = ImageFont.truetype(font_path, size=38 * ANTIALIAS)
+    measure_font = ImageFont.truetype(font_path, size=MEASURE_FONT_SIZE)
 
     # 2) Create the image and draw shapes.
     img = create_basic_diagram(
@@ -83,8 +78,9 @@ def draw_diagram(
         """
         if use_inches:
             return decimal_inches_to_fraction(units, to_32th=TO_THE_32TH) + '"'
-        else:
-            return f"{round(units, 1):.1f}"
+
+        precision = METRIC_DECIMAL_PRECISION
+        return f"{round(units, precision):.{precision}f}{UNITS_LABEL}"
 
     # 4a) Label the right side.
     px_right_x = to_px(paper_size, paper_size=paper_size) + PX_PADDING_FROM_EDGE
@@ -154,8 +150,48 @@ def draw_diagram(
             bracket_thickness_px=BRACKET_THICKNESS_PX,
         )
 
-    img = img.resize(
-        (img.width // ANTIALIAS, img.height // ANTIALIAS), resample=Image.LANCZOS
+    if TITLE_LOCATION is None:
+        img = img.resize(
+            (img.width // ANTIALIAS, img.height // ANTIALIAS),
+            resample=Image.LANCZOS,
+        )
+        return img
+
+    # 5) Add a title to the image.
+    # 5a) Determine the title string and load the font.
+    measure = to_label_string(paper_size)
+    title_str = f"{len(coords)}-sided Polygon in a {measure} Square"
+    title_font = ImageFont.truetype(font_path, size=TITLE_FONT_SIZE)
+
+    # 5b) Use the bbox to draw the text in the center of a separate image.
+    bbox = title_font.getbbox(title_str)
+    w, h = bbox[2] - bbox[0], int((bbox[3] - bbox[1]) * 2.5)
+    title_img = Image.new("RGB", (IMG_SIZE, h), "white")
+    title_draw = ImageDraw.Draw(title_img)
+    title_draw.text(
+        (IMG_SIZE / 2 - w / 2, 0),
+        title_str,
+        fill="gray",
+        font=title_font,
     )
 
-    return img
+    # 5c) Add the title image.
+    total_height = IMG_SIZE + h + TITLE_PADDING_PX
+
+    # Create a new blank image with combined height
+    combined = Image.new("RGB", (IMG_SIZE, total_height), "white")
+
+    # Paste the images on top of each other
+    if TITLE_LOCATION == "top":
+        combined.paste(title_img, (0, 0))
+        combined.paste(img, (0, TITLE_PADDING_PX + title_img.height))
+    else:
+        combined.paste(img, (0, 0))
+        combined.paste(title_img, (0, img.height + TITLE_PADDING_PX))
+
+    combined = combined.resize(
+        (combined.width // ANTIALIAS, combined.height // ANTIALIAS),
+        resample=Image.LANCZOS,
+    )
+
+    return combined

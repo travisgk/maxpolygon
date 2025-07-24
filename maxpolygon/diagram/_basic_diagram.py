@@ -13,25 +13,7 @@ from __future__ import annotations
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
-# Image output settings.
-ANTIALIAS = 3  # Antialias factor.
-IMG_SIZE = 1200 * ANTIALIAS  # Output image size (pixels)
-SQUARE_PADDING = 250 * ANTIALIAS  # Padding around the square (pixels)
-
-# Vertex render settings.
-CENTER_VERT_RADIUS = 5 * ANTIALIAS
-HINT_VERT_RADIUS = 6 * ANTIALIAS
-
-# Label settings.
-LABEL_POLY_VERTS = True
-LABEL_HINT_POINTS = True
-LABEL_OFFSET_X = 13 * ANTIALIAS
-LABEL_OFFSET_Y = 0 * ANTIALIAS
-LETTERS = "ac"  # a = anticlockwise, c = clockwise
-CLOCKWISE_COLOR = (0, 200, 100)  # label color for clockwise.
-ANTICLOCKWISE_COLOR = (0, 100, 200)  # label color for anticlockwise.
-LINE_COLOR = (137, 137, 137)
-SQUARE_BORDER_COLOR = (187, 187, 187)
+from maxpolygon._config import *
 
 
 def to_px(val, paper_size, invert: bool = False):
@@ -55,7 +37,7 @@ def create_basic_diagram(
     # 1) Load the fonts.
     current_file = Path(__file__).resolve()
     font_path = current_file.parent.parent / "res" / "font.otf"
-    big_font = ImageFont.truetype(font_path, size=41 * ANTIALIAS)
+    big_font = ImageFont.truetype(font_path, size=BIG_FONT_SIZE)
 
     # 2) Convert the units into pixels.
     def as_px(val, invert: bool = False):
