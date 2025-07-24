@@ -29,8 +29,12 @@ def label_edge(
     stem_dir: str,
     bracket_thickness_px,
     fill="gray",
+    label_fill=None,
 ):
     global _measure_font
+
+    if label_fill is None:
+        label_fill = fill
 
     def inc_angle(angle, add, exclude_360: bool):
         return (angle + add) % (360.0001 if exclude_360 else 360.0)
@@ -176,4 +180,4 @@ def label_edge(
         text_pos = (text_pos[0], text_pos[1] + text_h)
 
     # 9) Label the bracket with the measurement.
-    label_draw.text(text_pos, label_str, fill=fill, font=_measure_font)
+    label_draw.text(text_pos, label_str, fill=label_fill, font=_measure_font)

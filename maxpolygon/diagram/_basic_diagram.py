@@ -52,7 +52,7 @@ def create_basic_diagram(
     ]
 
     # 3) Create the image and drawing object.
-    img = Image.new("RGBA", (IMG_SIZE, IMG_SIZE), (255, 255, 255, 255))
+    img = Image.new("RGBA", (IMG_SIZE, IMG_SIZE), (0, 0, 0, 0))
     labels_img = Image.new("RGBA", (IMG_SIZE, IMG_SIZE), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
     labels_draw = ImageDraw.Draw(labels_img)
@@ -66,12 +66,12 @@ def create_basic_diagram(
             IMG_SIZE - SQUARE_PADDING,
         ],
         outline=SQUARE_BORDER_COLOR,
-        width=4 * ANTIALIAS,
+        width=6 * ANTIALIAS,
     )
 
     # 5) Draw the polygon and vertices.
     # 5a) Draw the polygon lines.
-    draw.polygon(px_coords, outline=LINE_COLOR, width=4 * ANTIALIAS)
+    draw.polygon(px_coords, outline=LINE_COLOR, width=6 * ANTIALIAS)
     for i, (x, y) in enumerate(coords):
         p_x, p_y = px_coords[i]
 

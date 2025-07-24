@@ -155,9 +155,57 @@ def draw_diagram(
             bracket_thickness_px=BRACKET_THICKNESS_PX,
         )
 
-    # 5) Collapse the labels layer down on top of the image.
-    img = Image.alpha_composite(img, labels_img)
-    img = img.convert("RGB")
+    # 5) Label the measurements to the center point.
+    if LABEL_MEASUREMENTS_TO_CENTER:
+        # 5a) Create a new image layer so the brackets for the center
+        #     are rendered under everything else.
+        under_layer = Image.new("RGBA", img.size, (0, 0, 0, 0))
+        under_draw = ImageDraw.Draw(under_layer)
+
+        # 5b) Label the horizontal length that shows where the center is.
+        start_x = to_px(0, paper_size=paper_size)
+        end_x = to_px(center[0], paper_size=paper_size)
+        const_y = to_px(center[1], paper_size=paper_size, invert=invert_y)
+        label_edge(
+            label_str=to_label_string(center[0]),
+            draw=under_draw,
+            label_draw=label_draw,
+            start_xy=(start_x, const_y),
+            end_xy=(end_x, const_y),
+            px_open=PX_OPEN,
+            stem_dir="up",
+            bracket_thickness_px=BRACKET_THICKNESS_PX,
+            fill=CENTER_BRACKET_COLOR,
+            label_fill=CENTER_BRACKET_LABEL_COLOR,
+        )
+
+        # 5c) Label the vertical length that shows where the center is.
+        start_y = to_px(0, paper_size=paper_size, invert=invert_y)
+        end_y = to_px(center[1], paper_size=paper_size, invert=invert_y)
+        min_y = min(start_y, end_y)
+        max_y = max(start_y, end_y)
+        const_x = to_px(center[0], paper_size=paper_size)
+        label_edge(
+            label_str=to_label_string(center[1]),
+            draw=under_draw,
+            label_draw=label_draw,
+            start_xy=(const_x, min_y),
+            end_xy=(const_x, max_y),
+            px_open=PX_OPEN,
+            stem_dir="right",
+            bracket_thickness_px=BRACKET_THICKNESS_PX,
+            fill=CENTER_BRACKET_COLOR,
+            label_fill=CENTER_BRACKET_LABEL_COLOR,
+        )
+
+    # 6) Collapse the labels layer down on top of the image.
+    result = Image.new("RGBA", img.size, (255, 255, 255, 255))
+    if LABEL_MEASUREMENTS_TO_CENTER:
+        result = Image.alpha_composite(result, under_layer)
+    result = Image.alpha_composite(result, img)
+    result = Image.alpha_composite(result, labels_img)
+    # img = Image.alpha_composite(img, labels_img)
+    img = result.convert("RGB")
 
     # 6) Size the image down and return it if the title is disabled.
     if TITLE_LOCATION is None:
