@@ -3,6 +3,10 @@ import os
 
 """
 MaxPolygon
+---
+This main script generates a diagram 
+for every 3-sided to 13-sided perfect polygon
+that will be inscribed as large as possible inside a square.
 """
 
 import maxpolygon

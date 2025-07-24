@@ -12,9 +12,13 @@ Description: This file contains functionality
 import math
 import numpy as np
 
+MAX_NUM_SIDES = 33
+
 # Create a cache of normalized polygon points
 # to optimize finding the best angle.
-_angles_cache = {n: np.linspace(0, 2 * np.pi, n, endpoint=False) for n in range(3, 33)}
+_angles_cache = {
+    n: np.linspace(0, 2 * np.pi, n, endpoint=False) for n in range(3, MAX_NUM_SIDES + 1)
+}
 
 
 def generate_polygon_coords(n: int, rotation=0.0):

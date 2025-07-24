@@ -14,18 +14,19 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
 # Image output settings.
-IMG_SIZE = 1200  # Output image size (pixels)
-SQUARE_PADDING = 250  # Padding around the square (pixels)
+ANTIALIAS = 3  # Antialias factor.
+IMG_SIZE = 1200 * ANTIALIAS  # Output image size (pixels)
+SQUARE_PADDING = 250 * ANTIALIAS  # Padding around the square (pixels)
 
 # Vertex render settings.
-CENTER_VERT_RADIUS = 5
-HINT_VERT_RADIUS = 6
+CENTER_VERT_RADIUS = 5 * ANTIALIAS
+HINT_VERT_RADIUS = 6 * ANTIALIAS
 
 # Label settings.
 LABEL_POLY_VERTS = True
 LABEL_HINT_POINTS = True
-LABEL_OFFSET_X = 3
-LABEL_OFFSET_Y = -10
+LABEL_OFFSET_X = 13 * ANTIALIAS
+LABEL_OFFSET_Y = 0 * ANTIALIAS
 LETTERS = "ac"  # a = anticlockwise, c = clockwise
 CLOCKWISE_COLOR = (0, 200, 100)  # label color for clockwise.
 ANTICLOCKWISE_COLOR = (0, 100, 200)  # label color for anticlockwise.
@@ -54,7 +55,7 @@ def create_basic_diagram(
     # 1) Load the fonts.
     current_file = Path(__file__).resolve()
     font_path = current_file.parent.parent / "res" / "font.otf"
-    big_font = ImageFont.truetype(font_path, size=41)
+    big_font = ImageFont.truetype(font_path, size=41 * ANTIALIAS)
 
     # 2) Convert the units into pixels.
     def as_px(val, invert: bool = False):
@@ -68,12 +69,11 @@ def create_basic_diagram(
         for hints in indexed_hint_points
     ]
 
-    # 3) Create the image and draws the shape.
-    # 3a) Create the image and drawing object.
+    # 3) Create the image and drawing object.
     img = Image.new("RGB", (IMG_SIZE, IMG_SIZE), "white")
     draw = ImageDraw.Draw(img)
 
-    # 3b) Draw the square border.
+    # 4) Draw the square border.
     draw.rectangle(
         [
             SQUARE_PADDING,
@@ -82,27 +82,42 @@ def create_basic_diagram(
             IMG_SIZE - SQUARE_PADDING,
         ],
         outline=SQUARE_BORDER_COLOR,
-        width=4,
+        width=4 * ANTIALIAS,
     )
 
-    # 3c) Draw the polygon lines.
-    draw.polygon(px_coords, outline=LINE_COLOR, width=4)
+    # 5) Draw the polygon and vertices.
+    # 5a) Draw the polygon lines.
+    draw.polygon(px_coords, outline=LINE_COLOR, width=4 * ANTIALIAS)
     for i, (x, y) in enumerate(coords):
         p_x, p_y = px_coords[i]
 
-    # 3d) Draw the center.
+    # 5b) Draw the polygon vertices that are on an edge.
+    indices_on_edge = [
+        i
+        for i, (x, y) in enumerate(px_coords)
+        if not all(
+            SQUARE_PADDING + 0.001 < d < IMG_SIZE - SQUARE_PADDING - 0.001
+            for d in (x, y)
+        )
+    ]
+    for i in indices_on_edge:
+        cx, cy = px_coords[i]
+        r = HINT_VERT_RADIUS
+        draw.ellipse((cx - r, cy - r, cx + r, cy + r), fill=LINE_COLOR)
+
+    # 5c) Draw the center.
     cx, cy = px_center
     r = CENTER_VERT_RADIUS
     draw.ellipse((cx - r, cy - r, cx + r, cy + r), fill=LINE_COLOR)
 
-    # 4) Draw the numbering labels for the polygon and its hint points.
-    # 4a) Label each point of the polygon.
+    # 6) Draw the numbering labels for the polygon and its hint points.
+    # 6a) Label each point of the polygon.
     if LABEL_POLY_VERTS:
         for index, (p_x, p_y) in enumerate(px_coords):
             text_pos = (p_x + LABEL_OFFSET_X, p_y + LABEL_OFFSET_Y)
             draw.text(text_pos, str(index + 1), fill="black", font=big_font)
 
-    # 4b) Draw the hint point vertices and labels.
+    # 6b) Draw the hint point vertices and labels.
     r = HINT_VERT_RADIUS
     for index, points in enumerate(px_indexed_hints):
         for point_index, (p_x, p_y) in enumerate(points):
@@ -126,7 +141,9 @@ def create_basic_diagram(
                 letter_str = f"{base_num}{LETTERS[point_index]}"
                 text_pos = (p_x + LABEL_OFFSET_X, p_y + LABEL_OFFSET_Y)
                 draw.text(text_pos, letter_str, fill=fill_color, font=big_font)
-                draw.line([main_point, (p_x, p_y)], fill=fill_color, width=4)
+                draw.line(
+                    [main_point, (p_x, p_y)], fill=fill_color, width=4 * ANTIALIAS
+                )
 
-    # 5) Return the finished PIL image.
+    # 7) Return the finished PIL image.
     return img

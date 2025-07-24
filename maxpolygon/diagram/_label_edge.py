@@ -10,6 +10,7 @@ Description: This file contains the function
 """
 
 from ._arc import draw_arc
+from ._basic_diagram import ANTIALIAS
 from maxpolygon.math.bracket import calc_bracket_points
 from pathlib import Path
 from PIL import ImageFont
@@ -28,7 +29,7 @@ def label_edge(
     fill="gray",
 ):
     global _measure_font
-    WIDTH = 6  # line width.
+    WIDTH = 6 * ANTIALIAS  # line width.
 
     def inc_angle(angle, add, exclude_360: bool):
         return (angle + add) % (360.0001 if exclude_360 else 360.0)
@@ -155,7 +156,7 @@ def label_edge(
     if _measure_font is None:
         current_file = Path(__file__).resolve()
         font_path = current_file.parent.parent / "res" / "font.otf"
-        _measure_font = ImageFont.truetype(font_path, size=38)
+        _measure_font = ImageFont.truetype(font_path, size=38 * ANTIALIAS)
 
     # 8) Center the text box.
     bbox = _measure_font.getbbox(label_str)
@@ -163,10 +164,11 @@ def label_edge(
     text_h = bbox[3] - bbox[1]
     text_pos = (text_pos[0] - text_w / 2, text_pos[1] - text_h)
 
+    F = 0.8
     if stem_dir == "right":
-        text_pos = (text_pos[0] + text_w, text_pos[1])
+        text_pos = (text_pos[0] + text_w * F, text_pos[1])
     elif stem_dir == "left":
-        text_pos = (text_pos[0] - text_w, text_pos[1])
+        text_pos = (text_pos[0] - text_w * F, text_pos[1])
     elif stem_dir == "up":
         text_pos = (text_pos[0], text_pos[1] - text_h)
     else:
@@ -174,29 +176,3 @@ def label_edge(
 
     # 9) Label the bracket with the measurement.
     draw.text(text_pos, label_str, fill=fill, font=_measure_font)
-
-    # draw.ellipse((g0[0] - 3, g0[1] - 3, g0[0] + 3, g0[1] + 3), fill="cyan")
-    # draw.ellipse((b0[0] - 3, b0[1] - 3, b0[0] + 3, b0[1] + 3), fill="yellow")
-    # draw.ellipse(
-    #    (branch[0] - 3, branch[1] - 3, branch[0] + 3, branch[1] + 3), fill="purple"
-    # )
-    """
-    k_point_a = (q_point_a[0], z_point[1] - abs(z_point[0] - q_point_a[0]))
-    k_point_b = (q_point_b[0], z_point[1] + abs(z_point[0] - q_point_b[0]))
-    draw_arc(
-        k_point_a, 
-        z_point, 
-        start=90, 
-        end=180, 
-        expand_right=increasing_x, 
-        expand_down=False,
-    )
-    draw_arc(
-        k_point_b, 
-        z_point, 
-        start=180,
-        end=270,
-        fill="blue",
-        expand_right=increasing_x,
-        expand_down=True,
-    )"""
