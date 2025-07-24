@@ -22,6 +22,7 @@ _measure_font = None
 def label_edge(
     label_str: str,
     draw,
+    label_draw,
     start_xy: tuple,
     end_xy: tuple,
     px_open,
@@ -175,4 +176,4 @@ def label_edge(
         text_pos = (text_pos[0], text_pos[1] + text_h)
 
     # 9) Label the bracket with the measurement.
-    draw.text(text_pos, label_str, fill=fill, font=_measure_font)
+    label_draw.text(text_pos, label_str, fill=fill, font=_measure_font)

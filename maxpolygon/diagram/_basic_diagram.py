@@ -52,8 +52,10 @@ def create_basic_diagram(
     ]
 
     # 3) Create the image and drawing object.
-    img = Image.new("RGB", (IMG_SIZE, IMG_SIZE), "white")
+    img = Image.new("RGBA", (IMG_SIZE, IMG_SIZE), (255, 255, 255, 255))
+    labels_img = Image.new("RGBA", (IMG_SIZE, IMG_SIZE), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
+    labels_draw = ImageDraw.Draw(labels_img)
 
     # 4) Draw the square border.
     draw.rectangle(
@@ -97,7 +99,7 @@ def create_basic_diagram(
     if LABEL_POLY_VERTS:
         for index, (p_x, p_y) in enumerate(px_coords):
             text_pos = (p_x + LABEL_OFFSET_X, p_y + LABEL_OFFSET_Y)
-            draw.text(text_pos, str(index + 1), fill="black", font=big_font)
+            labels_draw.text(text_pos, str(index + 1), fill="black", font=big_font)
 
     # 6b) Draw the hint point vertices and labels.
     r = HINT_VERT_RADIUS
@@ -122,10 +124,10 @@ def create_basic_diagram(
                 base_num = (index + off) % len(coords) + 1
                 letter_str = f"{base_num}{LETTERS[point_index]}"
                 text_pos = (p_x + LABEL_OFFSET_X, p_y + LABEL_OFFSET_Y)
-                draw.text(text_pos, letter_str, fill=fill_color, font=big_font)
+                labels_draw.text(text_pos, letter_str, fill=fill_color, font=big_font)
                 draw.line(
                     [main_point, (p_x, p_y)], fill=fill_color, width=4 * ANTIALIAS
                 )
 
-    # 7) Return the finished PIL image.
-    return img
+    # 7) Return the finished PIL image and the layer of labels.
+    return img, labels_img

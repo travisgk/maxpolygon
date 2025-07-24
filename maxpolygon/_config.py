@@ -26,7 +26,7 @@ TO_THE_32TH = True  # only applicable for inches.
 METRIC_DECIMAL_PRECISION = 1  #  only applicable for metric.
 UNITS_LABEL = "cm"  #  only applicable for metric.
 BRACKET_THICKNESS_PX = 90 * ANTIALIAS
-PX_PADDING_FROM_EDGE = 45 * ANTIALIAS  # between brackets and paper (in px).
+PX_PADDING_FROM_EDGE = 55 * ANTIALIAS  # between brackets and paper (in px).
 
 # Vertex render settings.
 CENTER_VERT_RADIUS = 8 * ANTIALIAS
@@ -34,7 +34,7 @@ HINT_VERT_RADIUS = 9 * ANTIALIAS
 
 # Font settings.
 TITLE_FONT_SIZE = 108 * ANTIALIAS
-BIG_FONT_SIZE = 72 * ANTIALIAS
+BIG_FONT_SIZE = 68 * ANTIALIAS  # used for the vertices.
 MEASURE_FONT_SIZE = 80 * ANTIALIAS
 
 # Label settings.

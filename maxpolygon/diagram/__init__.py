@@ -54,10 +54,11 @@ def draw_diagram(
     measure_font = ImageFont.truetype(font_path, size=MEASURE_FONT_SIZE)
 
     # 2) Create the image and draw shapes.
-    img = create_basic_diagram(
+    img, labels_img = create_basic_diagram(
         coords, center, indexed_hint_points, paper_size, invert_y
     )
     draw = ImageDraw.Draw(img)
+    label_draw = ImageDraw.Draw(labels_img)
 
     # 3) Determine the lengths
     #    of the subdivided side lengths for each edge.
@@ -92,6 +93,7 @@ def draw_diagram(
         label_edge(
             label_str=to_label_string(sublength),
             draw=draw,
+            label_draw=label_draw,
             start_xy=(px_right_x, px_y_start),
             end_xy=(px_right_x, px_y_end),
             px_open=PX_OPEN,
@@ -109,6 +111,7 @@ def draw_diagram(
         label_edge(
             label_str=to_label_string(sublength),
             draw=draw,
+            label_draw=label_draw,
             start_xy=(px_left_x, px_y_start),
             end_xy=(px_left_x, px_y_end),
             px_open=PX_OPEN,
@@ -126,6 +129,7 @@ def draw_diagram(
         label_edge(
             label_str=to_label_string(sublength),
             draw=draw,
+            label_draw=label_draw,
             start_xy=(px_x_start, px_top_y),
             end_xy=(px_x_end, px_top_y),
             px_open=PX_OPEN,
@@ -143,6 +147,7 @@ def draw_diagram(
         label_edge(
             label_str=to_label_string(sublength),
             draw=draw,
+            label_draw=label_draw,
             start_xy=(px_x_start, px_bottom_y),
             end_xy=(px_x_end, px_bottom_y),
             px_open=PX_OPEN,
@@ -150,6 +155,11 @@ def draw_diagram(
             bracket_thickness_px=BRACKET_THICKNESS_PX,
         )
 
+    # 5) Collapse the labels layer down on top of the image.
+    img = Image.alpha_composite(img, labels_img)
+    img = img.convert("RGB")
+
+    # 6) Size the image down and return it if the title is disabled.
     if TITLE_LOCATION is None:
         img = img.resize(
             (img.width // ANTIALIAS, img.height // ANTIALIAS),
@@ -157,13 +167,13 @@ def draw_diagram(
         )
         return img
 
-    # 5) Add a title to the image.
-    # 5a) Determine the title string and load the font.
+    # 7) Add a title to the image.
+    # 7a) Determine the title string and load the font.
     measure = to_label_string(paper_size)
     title_str = f"{len(coords)}-sided Polygon in a {measure} Square"
     title_font = ImageFont.truetype(font_path, size=TITLE_FONT_SIZE)
 
-    # 5b) Use the bbox to draw the text in the center of a separate image.
+    # 7b) Use the bbox to draw the text in the center of a separate image.
     bbox = title_font.getbbox(title_str)
     w, h = bbox[2] - bbox[0], int((bbox[3] - bbox[1]) * 2.5)
     title_img = Image.new("RGB", (IMG_SIZE, h), "white")
@@ -175,13 +185,12 @@ def draw_diagram(
         font=title_font,
     )
 
-    # 5c) Add the title image.
+    # 7c) Add the title image.
     total_height = IMG_SIZE + h + TITLE_PADDING_PX
-
     # Create a new blank image with combined height
     combined = Image.new("RGB", (IMG_SIZE, total_height), "white")
 
-    # Paste the images on top of each other
+    # 7d) Paste the images on top of each other
     if TITLE_LOCATION == "top":
         combined.paste(title_img, (0, 0))
         combined.paste(img, (0, TITLE_PADDING_PX + title_img.height))
@@ -189,6 +198,7 @@ def draw_diagram(
         combined.paste(img, (0, 0))
         combined.paste(title_img, (0, img.height + TITLE_PADDING_PX))
 
+    # 7e) Size the image down and return it.
     combined = combined.resize(
         (combined.width // ANTIALIAS, combined.height // ANTIALIAS),
         resample=Image.LANCZOS,
