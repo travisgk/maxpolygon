@@ -14,6 +14,7 @@ Description: This file defines constants that affect
 # Image output settings.
 ANTIALIAS = 3  # Antialias factor.
 IMG_SIZE = 1800 * ANTIALIAS  # Output image size (pixels)
+CUT_OUT_PADDING = 50 * ANTIALIAS  # Padding around the square (if for cut out).
 SQUARE_PADDING = 425 * ANTIALIAS  # Padding around the square (pixels)
 TITLE_LOCATION = "bottom"  # "top", "bottom", or None.
 TITLE_PADDING_PX = 75 * ANTIALIAS

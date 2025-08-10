@@ -23,7 +23,6 @@ def draw_arc(
     """
     Draws an arc from one coord to another
     with a (start) and (end) angle.
-
     """
 
     def make_bbox(start_xy, end_xy):

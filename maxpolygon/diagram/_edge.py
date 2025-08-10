@@ -12,13 +12,14 @@ Description: This file contains the function
 from ._arc import draw_arc
 from maxpolygon.math.bracket import calc_bracket_points
 
+
 def label_edge(
-	draw,
-	start_xy: tuple,
-	end_xy: tuple,
-	px_open,
-	stem_dir: str,
-	bracket_thickness_px,
+    draw,
+    start_xy: tuple,
+    end_xy: tuple,
+    px_open,
+    stem_dir: str,
+    bracket_thickness_px,
 ):
     def inc_angle(angle, add, exclude_360: bool):
         return (angle + add) % (360.0001 if exclude_360 else 360.0)
@@ -60,8 +61,8 @@ def label_edge(
         draw,
         end_xy,
         g1,
-        start_angle=g1_start, 
-        end_angle=g1_end, 
+        start_angle=g1_start,
+        end_angle=g1_end,
         fill="blue",
     )
 
@@ -73,20 +74,22 @@ def label_edge(
         branch,
         start_angle=inc_angle(g0_start, 180, exclude_360=exclude_360),
         end_angle=inc_angle(g0_end, 180, exclude_360=exclude_360),
-        fill="orange"
+        fill="orange",
     )
     draw_arc(
         draw,
         b1,
         branch,
-        start_angle=inc_angle(g1_start, 180, exclude_360=exclude_360), 
-        end_angle=inc_angle(g1_end, 180, exclude_360=exclude_360), 
+        start_angle=inc_angle(g1_start, 180, exclude_360=exclude_360),
+        end_angle=inc_angle(g1_end, 180, exclude_360=exclude_360),
         fill="pink",
     )
 
     draw.ellipse((g0[0] - 3, g0[1] - 3, g0[0] + 3, g0[1] + 3), fill="cyan")
     draw.ellipse((b0[0] - 3, b0[1] - 3, b0[0] + 3, b0[1] + 3), fill="yellow")
-    draw.ellipse((branch[0] - 3, branch[1] - 3, branch[0] + 3, branch[1] + 3), fill="purple")
+    draw.ellipse(
+        (branch[0] - 3, branch[1] - 3, branch[0] + 3, branch[1] + 3), fill="purple"
+    )
     """
     k_point_a = (q_point_a[0], z_point[1] - abs(z_point[0] - q_point_a[0]))
     k_point_b = (q_point_b[0], z_point[1] + abs(z_point[0] - q_point_b[0]))

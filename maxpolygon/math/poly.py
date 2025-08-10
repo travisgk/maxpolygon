@@ -238,3 +238,10 @@ def generate_paper_points(n: int, paper_size):
     indexed_hint_points = determine_hint_points(coords, paper_size)
 
     return coords, center, indexed_hint_points
+
+
+def scale_around_point(points: list, center: tuple, scale: float = 0.5) -> list:
+    c_x = center[0]
+    c_y = center[1]
+    center = (0, 0)
+    return [((x - c_x) * scale + c_x, (y - c_y) * scale + c_y) for (x, y) in points]
