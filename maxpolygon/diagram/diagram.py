@@ -124,6 +124,10 @@ def draw_diagram(
         percent_used = (IMG_SIZE - p * 2) / IMG_SIZE
         square_size = paper_size * percent_used
         result = _add_title_to_img(result, square_size, use_inches, len(coords))
+        result = result.resize(
+            (result.width // ANTIALIAS, result.height // ANTIALIAS),
+            resample=Image.LANCZOS,
+        )
         return result
 
     """
